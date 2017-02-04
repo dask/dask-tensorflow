@@ -28,7 +28,7 @@ install:
   - pip install --no-deps -e .
 
 script:
-    - py.test -m "not avoid_travis" distributed --verbose -r s --timeout-method=thread --timeout=300 --runslow --durations=20
+    - py.test dask_tensorflow --verbose
 
 notifications:
   email: false

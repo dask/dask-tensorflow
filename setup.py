@@ -27,6 +27,6 @@ setup(name='dask-tensorflow',
       install_requires=install_requires,
       extras_require=extras_require,
       packages=['dask_tensorflow'],
-      long_description=(open('README.md').read() if os.path.exists('README.md')
+      long_description=(open('README.rst').read() if os.path.exists('README.rst')
                         else ''),
       zip_safe=False)
