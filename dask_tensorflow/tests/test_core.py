@@ -10,6 +10,7 @@ def test_basic(c, s, a, b):
     assert isinstance(a.tensorflow_server, tf.train.Server)
     assert isinstance(b.tensorflow_server, tf.train.Server)
     assert isinstance(spec, tf.train.ClusterSpec)
+    assert sum(map(len, spec.as_dict().values())) == len(s.workers)
 
 
 def test_basic_sync(loop):

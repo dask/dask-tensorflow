@@ -1,0 +1,34 @@
+language: python
+sudo: true
+
+matrix:
+  fast_finish: true
+  include:
+    - python: "2.7"
+    - python: "3.5"
+
+
+install:
+  # Note we disable progress bars to make Travis log loading much faster
+
+  # Install conda
+  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+
+  # Install dependencies
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
+  - source activate test-environment
+  - conda install -q -c conda-forge pytest dask distributed tensorflow
+  - pip install -q git+https://github.com/dask/{dask,distributed}.git --upgrade
+
+  # Install distributed
+  - pip install --no-deps -e .
+
+script:
+    - py.test -m "not avoid_travis" distributed --verbose -r s --timeout-method=thread --timeout=300 --runslow --durations=20
+
+notifications:
+  email: false
