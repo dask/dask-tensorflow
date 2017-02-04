@@ -21,7 +21,12 @@ install:
   # Install dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - conda install -q -c conda-forge pytest dask distributed tensorflow
+  - conda install -q -c conda-forge pytest dask distributed
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then  # Taken from https://github.com/blei-lab/edward/blob/master/.travis.yml
+      pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.0.0rc0-cp27-none-linux_x86_64.whl;
+    elif [[ "$TRAVIS_PYTHON_VERSION" == "3.4" ]]; then
+      pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.0.0rc0-cp34-cp34m-linux_x86_64.whl;
+    fi
   - pip install -q git+https://github.com/dask/{dask,distributed}.git --upgrade
 
   # Install distributed
