@@ -29,10 +29,10 @@ def _start_tensorflow(client, **job_counts):
                          % (sum(job_counts.values()), len(info['workers'])))
 
     ports = defaultdict(lambda: 2221)
-    spec = {job_name: [] for job_name in job_counts}
+    tf_spec = {job_name: [] for job_name in job_counts}
+    dask_spec = {job_name: [] for job_name in job_counts}
     job_names = {}
     task_index = {}
-    worker_index = {}
     workers = iter(info['workers'])
     for job_name, count in job_counts.items():
         for i in range(count):
@@ -40,14 +40,14 @@ def _start_tensorflow(client, **job_counts):
             host = parse_host_port(w)[0].strip('/')
             ports[host] += 1
             tf_name = '%s:%d' % (host, ports[host])
-            spec[job_name].append(tf_name)
+            tf_spec[job_name].append(tf_name)
+            dask_spec[job_name].append(w)
             task_index[w] = i
             job_names[w] = job_name
-            worker_index[w] = tf_name
 
-    spec = tf.train.ClusterSpec(spec)
+    tf_spec = tf.train.ClusterSpec(tf_spec)
 
-    resp = yield {w: client._run(start_and_attach_server, spec,
+    resp = yield {w: client._run(start_and_attach_server, tf_spec,
                                  job_name=job_names[w],
                                  task_index=task_index[w],
                                  workers=[w]) for w in task_index}
@@ -55,7 +55,7 @@ def _start_tensorflow(client, **job_counts):
     if not all(v == 'OK' for v in resp.values()):
         raise ValueError("Setup did not succeed")
 
-    return spec, worker_index
+    return tf_spec, dask_spec
 
 
 def start_tensorflow(client, **kwargs):
