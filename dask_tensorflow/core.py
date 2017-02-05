@@ -3,6 +3,7 @@ from collections import defaultdict
 from toolz import merge
 from tornado import gen
 
+from distributed.compatibility import Queue
 from distributed.utils import sync
 from distributed.comm.tcp import parse_host_port
 import tensorflow as tf
@@ -11,6 +12,7 @@ import tensorflow as tf
 def start_and_attach_server(spec, job_name=None, task_index=None, dask_worker=None):
     server = tf.train.Server(spec, job_name=job_name, task_index=task_index)
     dask_worker.tensorflow_server = server
+    dask_worker.tensorflow_queue = Queue()
     return 'OK'
 
 
