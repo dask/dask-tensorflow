@@ -5,7 +5,6 @@ from tornado import gen
 
 from distributed.compatibility import Queue
 from distributed.utils import sync
-from distributed.comm.tcp import parse_host_port
 import tensorflow as tf
 
 
@@ -39,7 +38,7 @@ def _start_tensorflow(client, **job_counts):
     for job_name, count in job_counts.items():
         for i in range(count):
             w = next(workers)
-            host = parse_host_port(w)[0].strip('/')
+            host = w.split('://')[-1].rsplit(':')[0]
             ports[host] += 1
             tf_name = '%s:%d' % (host, ports[host])
             tf_spec[job_name].append(tf_name)
@@ -57,7 +56,7 @@ def _start_tensorflow(client, **job_counts):
     if not all(v == 'OK' for v in resp.values()):
         raise ValueError("Setup did not succeed")
 
-    return tf_spec, dask_spec
+    raise gen.Return((tf_spec, dask_spec))
 
 
 def start_tensorflow(client, **kwargs):
@@ -68,14 +67,14 @@ def start_tensorflow(client, **kwargs):
     Examples
     --------
     >>> client = Client('dask-scheduler-address:8786')
-    >>> spec, workers = start_tensorflow(client)
-    >>> spec.as_dict()
+    >>> tf_spec, dask_spec = start_tensorflow(client)
+    >>> tf_spec.as_dict()
     {'worker': ['192.168.1.100:2222', '192.168.1.101:2222']}
 
     Specify desired number of jobs types as keyword args
 
-    >>> spec, workers = start_tensorflow(client, ps=2, worker=4)
-    >>> spec.as_dict()
+    >>> tf_spec, dask_spec = start_tensorflow(client, ps=2, worker=4)
+    >>> tf_spec.as_dict()
     {'worker': ['192.168.1.100:2222', '192.168.1.101:2222',
                 '192.168.1.102:2222', '192.168.1.103:2222'],
      'ps': ['192.168.1.104:2222', '192.168.1.105:2222']}
