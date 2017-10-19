@@ -20,7 +20,7 @@ install:
   # Install dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - conda install -q -c conda-forge pytest dask distributed
+  - conda install -q -c conda-forge pytest pytest-xdist dask distributed
   - conda install tensorflow
 
   # Install distributed
