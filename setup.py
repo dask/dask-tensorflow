@@ -19,7 +19,7 @@ for r in requires:
         install_requires.append(r)
 
 setup(name='dask-tensorflow',
-      version='0.0.1',
+      version='0.0.2',
       description='Interactions between Dask and Tensorflow',
       maintainer='Matthew Rocklin',
       maintainer_email='mrocklin@gmail.com',
