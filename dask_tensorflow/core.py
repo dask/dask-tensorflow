@@ -3,7 +3,7 @@ from collections import defaultdict
 from toolz import merge
 from tornado import gen
 
-from distributed.compatibility import Queue
+from queue import Queue
 from distributed.utils import sync
 import tensorflow as tf
 
